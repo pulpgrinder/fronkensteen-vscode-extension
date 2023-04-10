@@ -42,20 +42,37 @@ function displayResult(result: string){
       return;
     }
 	let commentedresult = " ; " + result;
-		const startPosition = editor.selection.end;
-		editor.edit((editBuilder) => {
-		  editBuilder.insert(startPosition, commentedresult);
-		}).then((success) => {
-		  if (success) {
-			// Select the inserted text
-			const endPosition = startPosition.translate(0, commentedresult.length);
-			editor.selection = new vscode.Selection(startPosition, endPosition);
-			vscode.window.activeTextEditor?.show();
-		  } else {
-			vscode.window.showErrorMessage('Failed to insert result at cursor position.');
-		  }
-		});
+	insertAndSelectMultilineText(commentedresult);
 }
+
+
+async function insertAndSelectMultilineText(text: string): Promise<void> {
+	const editor = vscode.window.activeTextEditor;
+	if (!editor) {
+	  return;
+	}
+  
+	const startPosition = editor.selection.end;
+	const endPosition = calculateEndPosition(startPosition, text);
+  
+	const success = await editor.edit((editBuilder) => {
+	  editBuilder.insert(startPosition, text);
+	});
+  
+	if (success) {
+	  editor.selection = new vscode.Selection(startPosition, endPosition);
+	} else {
+	  vscode.window.showErrorMessage('Failed to insert text at the cursor position.');
+	}
+  }
+  
+  function calculateEndPosition(startPosition: vscode.Position, text: string): vscode.Position {
+	const lines = text.split('\n');
+	const lineDelta = lines.length - 1;
+	const characterDelta = lineDelta === 0 ? lines[0].length : lines[lines.length - 1].length;
+  
+	return startPosition.translate(lineDelta, characterDelta);
+  }
 
 export function activate(context: vscode.ExtensionContext) {
   let disposable = vscode.commands.registerCommand('extension.schemeExpressionEvaluator', async () => {
