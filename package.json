@@ -2,7 +2,7 @@
   "name": "remote-evaluate",
   "displayName": "Remote Evaluate",
   "description": "Remote evaluation of Scheme code for the Fronkensteen system",
-  "version": "0.0.3",
+  "version": "0.0.356",
   "homepage": "https://github.com/pulpgrinder",
   "license": "MIT",
   "publisher":"pulpgrinder.com",
